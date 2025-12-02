@@ -66,6 +66,11 @@ public static class MathExtensions
     }
 
     /// <summary>
+    /// Returns ceil(a / b) using exact integer arithmetic.
+    /// </summary>
+    public static int DivCeil(this int a, int b) => (a + b - 1) / b;
+
+    /// <summary>
     /// Computes 10^k using integer arithmetic (0 ≤ k ≤ 18).
     /// </summary>
     public static long PowerOf10(this int k)

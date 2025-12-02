@@ -30,13 +30,13 @@ public class Day02Test
     }
 
     [Test]
-    public void Example_Part2_ShouldReturn123()
+    public void Example_Part2_ShouldReturn4174379265()
     {
         // act
         var result = _day02.PartTwo(input);
 
         // assert
-        Assert.That(result, Is.EqualTo(123));
+        Assert.That(result, Is.EqualTo(4174379265));
     }
 }
 
