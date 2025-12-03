@@ -10,7 +10,10 @@ public class Day03Test
 
     private readonly string[] input =
     [
-        "testvalue"
+        "987654321111111",
+        "811111111111119",
+        "234234234234278",
+        "818181911112111"
     ];
 
     [SetUp]
@@ -18,15 +21,15 @@ public class Day03Test
     {
         _day03 = new Day03();
     }
-    
+
     [Test]
-    public void Example_Part1_ShouldReturn123()
+    public void Example_Part1_ShouldReturn357()
     {
         // act
         var result = _day03.PartOne(input);
-    
+
         // assert
-        Assert.That(result, Is.EqualTo(123));
+        Assert.That(result, Is.EqualTo(357));
     }
 
     [Test]
