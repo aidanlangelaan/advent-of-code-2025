@@ -1,3 +1,4 @@
+using System.Numerics;
 using AdventOfCode.Challenges;
 using NUnit.Framework;
 
@@ -29,17 +30,17 @@ public class Day03Test
         var result = _day03.PartOne(input);
 
         // assert
-        Assert.That(result, Is.EqualTo(357));
+        Assert.That((BigInteger)result, Is.EqualTo((BigInteger)357));
     }
 
     [Test]
-    public void Example_Part2_ShouldReturn123()
+    public void Example_Part2_ShouldReturn3121910778619()
     {
         // act
         var result = _day03.PartTwo(input);
 
         // assert
-        Assert.That(result, Is.EqualTo(123));
+        Assert.That((BigInteger)result, Is.EqualTo((BigInteger)3121910778619));
     }
 }
 
