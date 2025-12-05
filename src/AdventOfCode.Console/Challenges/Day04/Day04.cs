@@ -17,8 +17,8 @@ public class Day04 : SolutionBase
             var rollIndices = row.FindAllIndexof('@');
             foreach (var rollIndex in rollIndices)
             {
-                var neighbours = GetNeightboursForIndex(rollIndex, grid, row);
-                
+                var neighbours = GetNeighboursForIndex(rollIndex, grid, row);
+
                 var adjacentRolls = 0;
                 foreach (var (x, y) in neighbours)
                 {
@@ -38,7 +38,7 @@ public class Day04 : SolutionBase
         return rollCount;
     }
 
-    private static List<(int x, int y)> GetNeightboursForIndex(int rollIndex, char[][] grid, char[] row)
+    private static List<(int x, int y)> GetNeighboursForIndex(int rollIndex, char[][] grid, char[] row)
     {
         var neighbours = new List<(int x, int y)>();
         for (var y = -1; y <= 1; y++)
