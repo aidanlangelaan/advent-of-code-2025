@@ -19,7 +19,11 @@ public class Day05 : SolutionBase
 
     public override object PartTwo(string[] input)
     {
-        throw new NotImplementedException();
+        var ranges = GetRangesFromInput(input);
+
+        var mergedRanges = MergeRanges(ranges);
+
+        return mergedRanges.Sum(range => range.max - range.min + 1);
     }
 
     private static List<(long min, long max)> MergeRanges(IEnumerable<(long min, long max)> ranges)
