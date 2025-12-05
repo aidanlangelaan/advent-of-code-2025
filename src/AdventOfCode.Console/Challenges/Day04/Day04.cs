@@ -1,5 +1,6 @@
 using AdventOfCode.Core.Classes;
 using AdventOfCode.Core.Extensions;
+using AdventOfCode.Core.Helpers;
 
 namespace AdventOfCode.Challenges;
 
@@ -9,61 +10,63 @@ public class Day04 : SolutionBase
 
     public override object PartOne(string[] input)
     {
-        var grid = ParseInput(input);
-        var rollCount = 0;
+        var grid = GridHelper.ParseCharGrid(input);
 
-        foreach (var row in grid)
-        {
-            var rollIndices = row.FindAllIndexof('@');
-            foreach (var rollIndex in rollIndices)
-            {
-                var neighbours = GetNeighboursForIndex(rollIndex, grid, row);
-
-                var adjacentRolls = 0;
-                foreach (var (x, y) in neighbours)
-                {
-                    if (grid[y][x] == '@')
-                    {
-                        adjacentRolls++;
-                    }
-                }
-
-                if (adjacentRolls < 4)
-                {
-                    rollCount++;
-                }
-            }
-        }
+        var rollCount = ProcessGrid(ref grid);
 
         return rollCount;
     }
 
-    private static List<(int x, int y)> GetNeighboursForIndex(int rollIndex, char[][] grid, char[] row)
+    public override object PartTwo(string[] input)
     {
-        var neighbours = new List<(int x, int y)>();
-        for (var y = -1; y <= 1; y++)
-        {
-            for (var x = -1; x <= 1; x++)
-            {
-                if (x == 0 && y == 0) continue; // skip self
+        var grid = GridHelper.ParseCharGrid(input);
 
-                var newX = rollIndex + x;
-                var newY = Array.IndexOf(grid, row) + y;
-                if (newX >= 0 && newX < row.Length && newY >= 0 && newY < grid.Length)
+        var totalRolls = 0;
+        int rollCount;
+
+        do
+        {
+            rollCount = ProcessGrid(ref grid, withReplace: true);
+            totalRolls += rollCount;
+
+        } while (rollCount > 0);
+
+        return totalRolls;
+    }
+
+    private static int ProcessGrid(ref char[][] grid, bool withReplace = false)
+    {
+        var found = new List<(int row, int col)>();
+
+        for (var y = 0; y < grid.Length; y++)
+        {
+            var row = grid[y];
+            var rollIndices = row.FindAllIndexof('@');
+
+            foreach (var x in rollIndices)
+            {
+                var neighbours = GridHelper.GetNeighboursForIndex8(grid, x, y);
+
+                var adjacentRolls = 0;
+                foreach (var (nX, nY) in neighbours)
                 {
-                    neighbours.Add((newX, newY));
+                    if (grid[nY][nX] == '@') adjacentRolls++;
                 }
+
+                if (adjacentRolls >= 4) continue;
+
+                found.Add((y, x));
             }
         }
 
-        return neighbours;
-    }
+        if (withReplace)
+        {
+            foreach (var (row, col) in found)
+            {
+                grid[row][col] = 'x';
+            }
+        }
 
-    private static char[][] ParseInput(string[] input)
-        => input.Select(line => line.ToArray()).ToArray();
-
-    public override object PartTwo(string[] input)
-    {
-        throw new NotImplementedException();
+        return found.Count;
     }
 }
