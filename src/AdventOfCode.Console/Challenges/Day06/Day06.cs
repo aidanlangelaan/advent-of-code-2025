@@ -37,6 +37,78 @@ public class Day06 : SolutionBase
 
     public override object PartTwo(string[] input)
     {
-        throw new NotImplementedException();
+        int width = input.Max(l => l.Length);
+        var grid = input
+            .Select(line => line.PadRight(width, ' ').ToCharArray())
+            .ToList();
+
+        var operations = GetOperations(grid[^1]);
+
+        var total = 0L;
+
+        foreach (var operation in operations)
+        {
+            var numbers = new List<long>();
+            for (var i = operation.minColumn; i <= operation.maxColumn; i++)
+            {
+                var columnChars = new List<char>();
+                for (var j = 0; j < grid.Count - 1; j++)
+                {
+                    columnChars.Add(grid[j][i]);
+                }
+
+                var numberString = new string(columnChars.ToArray()).Trim();
+                if (long.TryParse(numberString, out var number))
+                {
+                    numbers.Add(number);
+                }
+            }
+
+            long result = operation.operation switch
+            {
+                '+' => numbers.Sum(),
+                '*' => numbers.Aggregate(1L, (a, b) => a * b),
+                _ => throw new InvalidOperationException(
+                    $"Unknown operator '{operation.operation}' in columns {operation.minColumn}-{operation.maxColumn}")
+            };
+
+            total += result;
+        }
+
+        return total;
+    }
+
+    private static List<(char operation, int minColumn, int maxColumn)> GetOperations(char[] operatorsRow)
+    {
+        var operations = new List<(char operation, int minColumn, int maxColumn)>();
+
+        int rowLength = operatorsRow.Length;
+        int position = 0;
+
+        while (position < rowLength)
+        {
+            while (position < rowLength && char.IsWhiteSpace(operatorsRow[position]))
+            {
+                position++;
+            }
+
+            if (position >= rowLength) break;
+
+            char operation = operatorsRow[position];
+            int minColumn = position;
+
+            var scan = position + 1;
+            while (scan < rowLength && char.IsWhiteSpace(operatorsRow[scan]))
+            {
+                scan++;
+            }
+
+            var maxColumn = (scan < rowLength) ? scan - 1 : rowLength - 1;
+            operations.Add((operation, minColumn, maxColumn));
+
+            position = scan;
+        }
+
+        return operations;
     }
 }
