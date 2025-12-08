@@ -1,3 +1,4 @@
+using System.Numerics;
 using AdventOfCode.Core.Classes;
 using AdventOfCode.Core.Helpers;
 
@@ -13,24 +14,8 @@ public class Day07 : SolutionBase
         int totalRows = grid.Length;
         int totalColumns = grid[0].Length;
 
-        var startPosition = grid
-            .SelectMany((row, y) => row.Select((cell, x) => (cell, x, y)))
-            .Where(c => c.cell == 'S')
-            .Select(c => (Column: c.x, Row: c.y))
-            .First();
-
-        var splittersByRow = new HashSet<int>[totalRows];
-        for (int y = 0; y < totalRows; y++)
-        {
-            splittersByRow[y] = new HashSet<int>();
-            for (int x = 0; x < totalColumns; x++)
-            {
-                if (grid[y][x] == '^')
-                {
-                    splittersByRow[y].Add(x);
-                }
-            }
-        }
+        var startPosition = GetStartPosition(grid);
+        var splittersByRow = GetSplittersByRow(totalRows, totalColumns, grid);
 
         var activeBeamColumns = new HashSet<int> { startPosition.Column };
         long splitterCount = 0;
@@ -61,13 +46,13 @@ public class Day07 : SolutionBase
                 {
                     nextBeamColumns.Add(column);
                 }
+            }
 
-                activeBeamColumns = nextBeamColumns;
+            activeBeamColumns = nextBeamColumns;
 
-                if (activeBeamColumns.Count == 0)
-                {
-                    break;
-                }
+            if (activeBeamColumns.Count == 0)
+            {
+                break;
             }
         }
 
@@ -76,7 +61,80 @@ public class Day07 : SolutionBase
 
     public override object PartTwo(string[] input)
     {
-        throw new NotImplementedException();
-    }
-}
+        var grid = GridHelper.ParseCharGrid(input);
+        int totalRows = grid.Length;
+        int totalColumns = grid[0].Length;
 
+        var startPosition = GetStartPosition(grid);
+        var splittersByRow = GetSplittersByRow(totalRows, totalColumns, grid);
+
+        var timelinesInRow = new BigInteger[totalColumns];
+        timelinesInRow[startPosition.Column] = 1;
+
+        for (int row = startPosition.Row + 1; row < totalRows; row++)
+        {
+            var nextRowTimelines = new BigInteger[totalColumns];
+
+            for (int col = 0; col < totalColumns; col++)
+            {
+                var count = timelinesInRow[col];
+                if (count == 0)
+                {
+                    continue;
+                }
+
+                if (splittersByRow[row].Contains(col))
+                {
+                    if (col - 1 >= 0)
+                    {
+                        nextRowTimelines[col - 1] += count;
+                    }
+
+                    if (col + 1 < totalColumns)
+                    {
+                        nextRowTimelines[col + 1] += count;
+                    }
+                }
+                else
+                {
+                    nextRowTimelines[col] += count;
+                }
+            }
+
+            timelinesInRow = nextRowTimelines;
+        }
+
+        BigInteger totalTimelines = 0;
+        for (int col = 0; col < totalColumns; col++)
+        {
+            totalTimelines += timelinesInRow[col];
+        }
+
+        return totalTimelines;
+    }
+
+    private static HashSet<int>[] GetSplittersByRow(int totalRows, int totalColumns, char[][] grid)
+    {
+        var splittersByRow = new HashSet<int>[totalRows];
+        for (int y = 0; y < totalRows; y++)
+        {
+            splittersByRow[y] = new HashSet<int>();
+            for (int x = 0; x < totalColumns; x++)
+            {
+                if (grid[y][x] == '^')
+                {
+                    splittersByRow[y].Add(x);
+                }
+            }
+        }
+
+        return splittersByRow;
+    }
+
+    private static (int Column, int Row) GetStartPosition(char[][] grid)
+        => grid
+            .SelectMany((row, y) => row.Select((cell, x) => (cell, x, y)))
+            .Where(c => c.cell == 'S')
+            .Select(c => (Column: c.x, Row: c.y))
+            .First();
+}
